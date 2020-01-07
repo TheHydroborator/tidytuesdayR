@@ -20,7 +20,7 @@ tt_make_url.date <- function(x) {
   if (!as.character(tt_formatted_date) %in% tt_folders) {
     stop(paste0(tt_formatted_date, " is not a date that has TidyTuesday data.\n\tDid you mean: ", tt_closest_date(tt_formatted_date, tt_folders), "?"))
   }
-  tt_url <- file.path("https://github.com/rfordatascience/tidytuesday/tree/master/data", tt_year, tt_formatted_date)
+  tt_url <- file.path("data", tt_year, tt_formatted_date)
 }
 
 tt_make_url.year <- function(x, week) {
@@ -30,7 +30,7 @@ tt_make_url.year <- function(x, week) {
   } else if (week < 1) {
     stop(paste0("Week entry must be a valid positive integer between 1 and ", length(tt_folders), "."))
   }
-  tt_url <- file.path("https://github.com/rfordatascience/tidytuesday/tree/master/data", x, tt_folders[week])
+  tt_url <- file.path("data", x, tt_folders[week])
 }
 
 tt_weeks <- function(year) {
@@ -41,21 +41,14 @@ tt_weeks <- function(year) {
       min(as.numeric(tt_year)), " to ", max(as.numeric(tt_year))
     ))
   }
-  tt_base_url <- file.path("https://github.com/rfordatascience/tidytuesday/tree/master/data", year)
-  tt_folders <- xml2::read_html(tt_base_url) %>%
-    rvest::html_nodes(".files") %>%
-    rvest::html_nodes(".content") %>%
-    rvest::html_nodes("a") %>%
-    rvest::html_attr("title")
+  tt_folders <- tt_gh_api(paste0("data/",year))
   tt_folders <- tt_folders[valid_date(tt_folders)]
 }
 
 tt_years <- function() {
-  tt_years <- xml2::read_html("https://github.com/rfordatascience/tidytuesday/tree/master/data") %>%
-    rvest::html_nodes(".files") %>%
-    rvest::html_nodes(".content") %>%
-    rvest::html_nodes("a") %>%
-    rvest::html_attr("title")
+
+  tt_years <- tt_gh_api("data")
+
   suppressWarnings({
     tt_years[!is.na(as.numeric(tt_years))]
   })

@@ -83,6 +83,8 @@ tt_load_gh <- function(x, week) {
     rvest::html_attrs() %>%
     purrr::map_chr(`[`, "title")
 
+
+
   files_to_use <- available_files
 
   # remove readme or directory folders or pictures
